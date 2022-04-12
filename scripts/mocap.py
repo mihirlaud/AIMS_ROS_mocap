@@ -116,7 +116,7 @@ async def main(network_config_file_name, pub):
 
 if __name__ == '__main__':
     try:
-        pub = rospy.Publisher('mocap_pos', PoseStamped, queue_size=10)
+        pub = rospy.Publisher('/mavros/vision_pose/pose', PoseStamped, queue_size=10)
 
         rospy.init_node('talker', anonymous=True)
 
