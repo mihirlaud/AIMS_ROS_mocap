@@ -9,7 +9,8 @@ import json
 import numpy as np
 import socket
 import rospy
-from geometry_msgs.msg import PoseStamped, Point
+from geometry_msgs.msg import PoseStamped, Point, Quaternion
+from scipy.spatial.transform import Rotation as R
 
 def create_body_index(xml_string):
     """ Extract a name to index dictionary from 6-DOF settings xml """
@@ -101,11 +102,19 @@ async def main(network_config_file_name, pub):
                 z = position.z/1000.0
                 t = rospy.Time.now()
 
+                rotation_np = R.from_matrix(np.asarray(rotation.matrix, dtype=np.float64).reshape(3, 3)).as_quat()
+                r_x = rotation_np[0]
+                r_y = rotation_np[1]
+                r_z = rotation_np[2]
+                r_w = rotation_np[3]
+
                 msg = PoseStamped()
                 msg.header.stamp = t
                 msg.pose.position = Point(x, y, z)
+                msg.pose.orientation = Quaternion(r_x, r_y, r_z, r_w)
 
                 rospy.loginfo(msg)
+#                rospy.loginfo(rotation_np.as_quat())
                 pub.publish(msg)
 
         # Start streaming frames
